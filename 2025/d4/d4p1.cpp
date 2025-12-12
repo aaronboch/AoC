@@ -2,36 +2,33 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <tuple>
 std::vector<std::string> readFile(const std::string& filePath);
 
 int main() {
   //   std::vector<std::string> input = readFile("./input/test");
   std::vector<std::string> input = readFile("./input/input");
-  int length = input[0].length();
   int result = 0;
-  for (int i = 0; i < input.size(); i++) {
-    for (int j = 0; j < length; j++) {
+  std::vector<std::tuple<int, int>> directions = {
+      {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+  int rows = input.size();
+  int cols = input[0].length();
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
       int adjacent = 0;
-      if (input[i][j] == '@') {
-        if (i != 0) {
-          // check top 3
-          if (j != 0) adjacent += input[i - 1][j - 1] == '@' ? 1 : 0;
-          adjacent += input[i - 1][j] == '@' ? 1 : 0;
-          if (j != length - 1) adjacent += input[i - 1][j + 1] == '@' ? 1 : 0;
+      if (input[row][col] != '@') continue;
+
+      for (auto [rowDir, colDir] : directions) {
+        int neighborRow = row + rowDir;
+        int neighborCol = col + colDir;
+        if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 &&
+            neighborCol < cols && input[neighborRow][neighborCol] == '@') {
+          adjacent++;
         }
-        // check left
-        if (j != 0) adjacent += input[i][j - 1] == '@' ? 1 : 0;
-        // right
-        if (j != length - 1) adjacent += input[i][j + 1] == '@' ? 1 : 0;
-        if (i != input.size() - 1) {
-          // check bottom 3
-          if (j != 0) adjacent += input[i + 1][j - 1] == '@' ? 1 : 0;
-          adjacent += input[i + 1][j] == '@' ? 1 : 0;
-          if (j != length - 1) adjacent += input[i + 1][j + 1] == '@' ? 1 : 0;
-        }
-        if (adjacent < 4) {
-          result++;
-        }
+      }
+
+      if (adjacent < 4) {
+        result++;
       }
     }
   }
